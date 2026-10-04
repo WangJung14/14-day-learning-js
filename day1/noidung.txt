@@ -78,4 +78,66 @@ Ví dụ thực tế :
 5. Bẫy ép kiểu ngầm định So sánh == vs ===
  1. ===(Strict Equality) : So sánh nghiêm ngặt, không bao giờ tự ý thay đổi kiểu dữ liệu. Nếu khác kiểu sẽ trả về false ngay lập thức
  2. == (loose Equality) : So sánh lỏng lẻo, Nếu 2 bên khác kiểu dữ liệu, JS sẽ kích hoạt thuật toán ép kiểu ngầm định(Type Coercion), cố gắng biến đổi chúng về cùng một kiểu rồi mới so sánh
- 
+6. Danh sách các giá trị Falsy trong JS
+Để hiểu sâu hơn về JS diễn giải các giá trị trong điều kiện logic, ta cần nắm rõ khái niệm Truthy và Falsy 
+Trong JS chỉ có đúng 8 kiểu Falsy ( khi ép về kiểu Boolean sẽ thành false)
+    + false
+    + 0, -0, 0n (BigInt)
+    + "" (chuỗi rỗng)
+    + null
+    + undefined
+    + NaN
+--> Tất cả các giá trị còn lại đều là Truthy kể cả mảng rỗng hoặc đối tượng rỗng {}
+7. Toán tử logic và cơ chế ngắn mạch (Short - Circuit)
+Một điều rất đặc biệt trong JavaScript: hai toán tử && (AND) và || (OR) không nhất thiết trả về true hoặc false. Thay vào đó, chúng trả về giá trị của biểu thức quyết định kết quả.
+ 1. Toán tử OR || : A || B nếu A là Truthy trả về A ngay không xét B --> Thường dùng để gán giá trị măc định fallback
+ 2. Toán tử AND && : A && B nếu A Falsy , trả về A ngay không xét  và nếu A là Truthy trả về B --> Thường dùng để kiểm tra điều kiện trước khi thực thi việc tiếp theo
+8. Toán tử 3 ngôi (Ternary Operator)
+Toán tử 3 ngôi là cách viết thu gọn của câu lệnh if...else, nhưng có một điểm khác biệt then chốt: nó là một biểu thức(Expression) có thể trả về một giá trị trực tiếp để gán vào biến
+Cú pháp : condition ? true_value : false_value
+Cách thức hoạt động : 
+    1. JS đánh giá condition xem là Truthy hay Falsy
+    2. Nếu Truthy --> lấy phần nằm giữa ? và :
+    3. Nếu Falsy --> lấy phần nằm sau dấu :
+9 Phân biệt giữa Expression(Biểu thức) và Statement(Câu lệnh)
+ 1. Expression - biểu thức :
+ - Bản chất là một đoạn mã được tính toán để tạo ra 1 giá trị. Dấu hiệu nhận biết có thể đặt vào vế phải dấu = hoặc tham chiếu và hàm 
+  ex: 5 + 10, age >= 21, "Xin Chào" + name
+ 2. Statement - câu lệnh :
+ - Bản chất là một chỉ thị hay hành động ra lệnh cho máy tính thực hiện chuỗi thao tác. Dấu hiệu nhận biết không sinh ra một giá trị để gán trực tiếp 
+ ex : let  x = 10, vòng lặp for , khối if else 
+10. Khái niệm Binding và mô hình biến let vs const:
+Để hiếu đúng được bản chất của biến trong JS:
+- Hãy hình dung Variable Binding giống như một sợi dây nối đang buộc chặt một cái tên với 1 giá trị trong bộ nhớ 
+ 1. const : Buộc cố định vĩnh viễn vào 1 giá trị ban đầu. Không cho phép biến đó được gán lại giá trị (reassign) 
+    ex : const pi = 3.14
+ 2. let : có thể tháo ra và buộc với 1 giá trị mới  
+    ex : let age = 10;
+        age = 21; // hợp lệ
+!!! Lưu ý : không nên dùng var trong code hiện nay. var có phạm vi theo hàm , dễ gây lỗi ghi đè tên biến mà không thông báo trước và cơ chế kéo biến lên đầu thiếu an toàn
+11. Vòng lặp for , while và do...while
+ 1. Vòng lặp while(condition) : kiểm tra trước. Nếu đều kiện đúng thì mới chạy code trong phần thân
+ 2. Vòng lặp do{...} while(condition): Chạy phần thân trước ít nhất 1 lần, sau đó kiểm tra điều kiện. Nếu đúng thì chạy tiếp phần thân
+ 3. Vòng lặp for (init_variable; condition ; step) : vòng lặp đếm có cấu trúc chặt chẽ
+12. Điều kiện vòng lặp : break vs continue
+Trong khi vòng lặp đang chạy , đôi khi ta muốn can thiệp vào tiến trình của nó thì ta có thể dùng 2 từ khóa: 
+ 1. break : lập tức kết thúc và thoát hoàn toàn khỏi vòng lặp bỏ qua mọi lần lặp tiếp theo 
+ 2. continue: lập tức bỏ qua phần còn lại của lần lặp hiện tại và nhảy sang bước cập nhật i++ để chuẩn bị cho lần lặp tiếp theo
+13. Toán tử cập nhật : phân biệt i++ và ++i 
+Cả 2 đều làm nhiệm vụ tăng biến i lên 1 đơn vị , nhưng thời điểm trả về giá trị của biếu thức lại khác nhau
+ 1. Postfix(i++) : trả về giá trị trước khi tăng
+ 2. Prefix(++i) : Tăng giá trị trước, rồi trả về giá trị sau khi tăng 
+14 Khối lệnh switch...case và hiện tượng trôi dòng Fallthrough
+Khi cần so sánh một giá trị với nhiều trường hợp cố định, switch giúp mã nguồn gọn gàn hơn nhiều khối if...else lồng nhau
+cấu trúc câu lệnh 
+switch(Expression){
+    case value_1:
+        // code thực thi khi Expression === value_1
+        break;
+    case value_2:
+        // code thực thi khi Expression === value_2
+       break;
+    default:
+        // thực thi khi không khớp với bất kỳ case nào
+}
+!!!! Lưu ý quan trọng : switch luôn so sánh theo cơ chế strict Equality(===) không thực hiện ép kiểu ngầm định
