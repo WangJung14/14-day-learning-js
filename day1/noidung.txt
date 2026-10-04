@@ -1,0 +1,81 @@
+1. Bản chất của Number & chuẩn IEEE754
+- Trong nhiều ngôn ngữ lập trình như C , C++ , Java hệ thống số được chia thành nhiều loại :
+int(32 bit), long(64bit), float(số thực dấu phẩy động 32bit),double (64 bit)
+- Nhưng trong Javascript kiểu number chỉ sử dụng duy nhất một định dạng: số thực dấu phẩy động dộ chính xác kép 64 bit (double precision floating point) theo chuẩn IEEE754
+- 64 bit này được chia thành 3 phần trên thanh ghi bộ nhớ:
+    + 1 bit : dấu (sigh bit) - quy định âm hay dương
+    + 11 bit : Phần mũ (Exponent) - quy định độ lớn / dịch chuyển lũy thừa của 2
+    + 52 bit : Phần định trị (Fraction/Mantissa) - lưu trữ các chữ số có nghĩa nhị phân
+--> Chính vì cơ chế này nên máy tính không lưu trữ số thập phân cơ số 10 một cách tự nhiên và bắt buộc phải chuyển sang nhị phân 
+!!! Vì sao 0.1 + 0.2 !== 0.3
+Giải thích:
+Hãy thử làm 1 phép so sánh nhỏ:
+- Trong hệ thập nhân cơ số 10 phép chia 1 / 3 = 0.333333 kéo dài vô tận. Ta không thể nào viết hết số này ra một trang giấy có giới hạn
+- Tương tự trong hệ nhị phân (cơ số 2): những số thập phân như 0.1 hay 0.2 khi đổi sang nhị phân lại bị lặp vô hạn tuần hoàn:
+    + 0.1 cơ số 10 = 0.00011001100110011... cơ số 2
+    + 0.2 cơ số 10 = 0.00110011001100110... cơ số 2
+- Nhưng phần lưu trữ Mantissa của JS chỉ có đúng 52 ô chứa 52 bit
+--> Do đó , máy tính buộc phải làm tròn dãy số vô hạn đó để nhét vừa vào 52 bit
+ex : khi yêu cầu máy tính thực hiện phép tính 0.1 + 0.2 máy tính sẽ lấy 2 giá trị đã làm tròn cộng lại với nhau và kết quả thực tế sẽ là:
+--> 0.30000000000000004 
+--> Vì vậy khi đem biểu thức 0.1 + 0.2 đi so sánh với 0.3 thì máy tính sẽ trả về false
+2. 3 Giá trị số đặc biệt trong Javascript: 
+- Dù là kiểu number, Javascript có 3 giá trị rất đặc biệt: 
+    + Infinity : Dương vô cùng, sinh ra khi bạn chia một số dương cho 0, Ví dụ : 1/0
+    + -Infinity : Âm vô cùng, sinh ra khi chia 1 số âm cho 0 , ví dụ -1/0
+    + NaN: Viết tắt của Not a number(Không phải 1 số hợp lệ). Nó xuất hiện khi bạn thực hiện 1 phép toán vô nghĩa về mặt toán học. Ví dụ lấy chữ nhân với số:
+    Ex: "hello" * 5.
+!!! Vì sao so sánh NaN === NaN lại trả về giá trị false
+--> Khi một phép tính bị lỗi thì kết quả trả về đơn giản là "Tôi không xác định được con số cụ thể nào ở đây". Hai kết quả không xác định được thì không thể xem là bằng nhau được
+--> NaN không bao giờ bằng bất cứ thứ gì kể cả chính nó 
+Vì quy tắt ở trên nên sinh ra 2 vấn đề nghiêm trọng
+    1. tại sao typeof NaN lại là number
+    - Tên gọi của nó là not a number nhưng khi kiểm tra kiểu dữ liệu thì 
+    typeof NaN // "number"
+    - Để giải thích vấn đề này:
+        + Về mặt dữ liệu (Data type): Nó vẫn thuộc miền giá trị number của chuẩn IEEE754 nhưng được lưu trữ trong 64bit của một số
+        + Về mặt ngữ nghĩa giá trị (Semantic Value): Nó biểu thị trạng thái một phép toán số học đã thất bại hoặc cho ra kết quả không xác định
+    2. Làm thế nào để kiểm tra 1 giá trị có phải là NaN không ?
+    Vì x === NaN luôn ra false, JavaScript cung cấp sẵn công cụ để kiểm tra. Tuy nhiên, có hai hàm kiểm tra khác nhau:
+        1. Hàm cũ
+        dùng isNaN(val) -> cơ chế hoạt động sẽ là tự động ép kiểu giá trị về số trước, nếu thất bại thì coi là true. Ex isNaN("chữ") -> true
+        2. Hàm mới theo chuẩn ES6:
+        Number.isNaN(val) -> Cơ chế hoạt động sẽ là kiểm tra nghiêm ngặt phải vừa là kiểu number vừa mang giá trị NaN 
+        ex : Number.isNaN("chữ") -> false
+        ex : Number.isNaN("NaN") -> true
+3. Chuỗi ký tự (String) và bộ nhớ UTF-16
+Bên cạnh kiểu dữ liệu Number, kiểu dữ liệu nguyên thủy tiếp theo sẽ là String
+Trong JS mình sẽ có 3 cách để tạo chuỗi:
+ 1. Ngoặc đơn '...'
+ 2. Ngoặc kép "..."
+ 3. Backtick dấu huyền `...` (Template Literal) ==> Sẽ được sử dụng nhiều
+Hai loại dấu hoặc đơn và kép hoàn toàn tương đương với nhau. Điểm khác nhau nằm ở dấu Backtick:
+- Nó cho phép viết chuỗi trên nhiều dòng (multiline) mà không cần sử dụng ký tự đặc biệt \n 
+- Cho phép nhúng trực tiếp biểu thức Expression thông qua cú pháp ${...}
+ex : const age = 21;
+     console.log(`Năm sau tôi sẽ ${age + 1} tuổi`) // In ra :"Năm sau tôi sẽ 21 tuổi"
+Bản chất bộ nhớ của String :UTF-16 code unit
+JS lưu trữ chuỗi ký tự theo chuẩn UTF-16. Mỗi kí tự thông thường chiếm 16bit(2byte) trong bộ nhớ gọi là 1 code unit
+Hầu hết chữ cái tiếng anh, số và chữ tiếng việt cơ bản đều vừa vặn trong 16bit này
+"A".length // 1
+"a".length // 1
+Nhưng có 1 số trường hợp đặc biệt. Một số biểu tượng cảm xúc emoji hoặc ký tự cổ có mã số rất lớn,16 bit không thể chứa nổi.
+Khi gặp trường hợp như trên JS phải ghép 2 Code unit 16 lại gọi là Surrogate Pair để biểu diễn ký tự đó
+
+4. Góa trị rỗng: Phân biệt giữa null và undefined
+Trong JS cả 2 đều thể hiện trạng thái không có dữ liệu nhưng bản chất về mặt kỹ thuật và ngữ nghĩa sử dụng lại khác biệt:
+ 1. undefined :
+  Về mặt ngữ nghĩa Chưa được định nghĩa hoặc chưa gán giá trị
+  Nguồn gốc : Thường do hệ thống hoặc máy tính tự sinh ra khi biến vừa khai báo chưa có dữ liệu
+  Kiểu dữ liệu typeof --> undefined
+ 2. null :
+  ngữ nghĩa : Chủ động chỉ định trạng thái rỗng , không có giá trị
+  nguồn gốc : Do lập trình viên chủ động gán để dọn dẹp hoặc khởi tạo
+  Kiểu dữ liệu typeof --> object
+Ví dụ thực tế :
+- Khi người dùng đăng ký tài khoản mới: Field isMarried người dùng chưa điền --> JS sẽ tạm coi đó là undefined
+- Khi người dùng chủ động chọn ô: "Single"(không có thông tin về vợ hay chồng) -> spouseInformation
+5. Bẫy ép kiểu ngầm định So sánh == vs ===
+ 1. ===(Strict Equality) : So sánh nghiêm ngặt, không bao giờ tự ý thay đổi kiểu dữ liệu. Nếu khác kiểu sẽ trả về false ngay lập thức
+ 2. == (loose Equality) : So sánh lỏng lẻo, Nếu 2 bên khác kiểu dữ liệu, JS sẽ kích hoạt thuật toán ép kiểu ngầm định(Type Coercion), cố gắng biến đổi chúng về cùng một kiểu rồi mới so sánh
+ 
