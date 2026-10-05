@@ -53,7 +53,7 @@ Hai loại dấu hoặc đơn và kép hoàn toàn tương đương với nhau. 
 - Nó cho phép viết chuỗi trên nhiều dòng (multiline) mà không cần sử dụng ký tự đặc biệt \n 
 - Cho phép nhúng trực tiếp biểu thức Expression thông qua cú pháp ${...}
 ex : const age = 21;
-     console.log(`Năm sau tôi sẽ ${age + 1} tuổi`) // In ra :"Năm sau tôi sẽ 21 tuổi"
+     console.log(`Năm sau tôi sẽ ${age + 1} tuổi`) // In ra :"Năm sau tôi sẽ 22 tuổi"
 Bản chất bộ nhớ của String :UTF-16 code unit
 JS lưu trữ chuỗi ký tự theo chuẩn UTF-16. Mỗi kí tự thông thường chiếm 16bit(2byte) trong bộ nhớ gọi là 1 code unit
 Hầu hết chữ cái tiếng anh, số và chữ tiếng việt cơ bản đều vừa vặn trong 16bit này
@@ -74,7 +74,7 @@ Trong JS cả 2 đều thể hiện trạng thái không có dữ liệu nhưng 
   Kiểu dữ liệu typeof --> object
 Ví dụ thực tế :
 - Khi người dùng đăng ký tài khoản mới: Field isMarried người dùng chưa điền --> JS sẽ tạm coi đó là undefined
-- Khi người dùng chủ động chọn ô: "Single"(không có thông tin về vợ hay chồng) -> spouseInformation
+- Khi người dùng chủ động chọn ô: "Single"(không có thông tin về vợ hay chồng) -> spouseInformation --> null
 5. Bẫy ép kiểu ngầm định So sánh == vs ===
  1. ===(Strict Equality) : So sánh nghiêm ngặt, không bao giờ tự ý thay đổi kiểu dữ liệu. Nếu khác kiểu sẽ trả về false ngay lập thức
  2. == (loose Equality) : So sánh lỏng lẻo, Nếu 2 bên khác kiểu dữ liệu, JS sẽ kích hoạt thuật toán ép kiểu ngầm định(Type Coercion), cố gắng biến đổi chúng về cùng một kiểu rồi mới so sánh
