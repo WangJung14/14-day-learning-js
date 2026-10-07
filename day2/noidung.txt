@@ -1,0 +1,144 @@
+I. Các phương thức khai báo hàm (Function Notation) và cơ chế Hoisting
+1. Ba cách định nghĩa hàm trong JS
+Trong JS , một hàm có thể được tạo ra qua 3 cú pháp chính:
+ 1.Function Declaration (Khai báo hàm truyền thống): 
+ ex function sum(a + b){
+    return a + b;
+ }
+
+ 2.Function Expression(Biểu thức hàm):
+ ex const sum = function(a  + b ){
+    return a + b;
+ };
+
+ 3. Arrow Function(Hàm mũi tên - ES6):
+ - 1 tham số : có thể bỏ dấu ngoặc tròn (), ví dụ x => x * 2
+ - Thân hàm chỉ có 1 biểu thức (implicit return) : Có thể bỏ cặp ngoặc nhọm và từ khóa return, giá trị của biểu thức sẽ tự động trả về
+ ex const sum = (a , b) => a + b;
+
+!!! Cạm bẫy : trả về 1 object literal ngầm định : 
+- Giả sử muốn viết 1 hàm nhận vào tên và trả về ngay 1 object
+ const createUser = name => { name : name };
+ --> cách viết như thế này sẽ báo lỗi syntaxError
+ Để fix lỗi này bắt buộc phải bọc object trong ngoặc tròn ():
+ const createUser = name => ({ name : name });
+ --> Để giải thích vì sao không có dấu ngoặc tròn bọc trong ngoặc nhọn sẽ bị báo lối cú pháp:
+ Trong JS, dấu ngoặc nhọn {} đóng 2 vai trò hoàn toàn khác nhau tùy thuộc vào ngữ cảnh:
+ + Object literal : Tạo ra 1 đối tượng chứa dữ liệu , ví dụ { name : "Tommy" } 
+ + Block Statement (khối lệnh) : Gom các câu lệnh lại với nhau trong thân hàm , vòng lặp hoặc khối if, ví dụ if(x){} hoặc function(){} 
+ Khi ta viết 1 Arrow function như sau :
+ const createUser = name => { name : name };
+ JS khi đọc đến ký tự mũi tên => sẽ nhìn thấy ngoặc nhọn nó sẽ ngầm hiểu rằng:
+ + đây là mở đầu cho khối lệnh (Block Statement) của thâm hàm , chứ không phải là 1 object
+ + bên trong thân hàm, khi bắt gặp cú pháp name : name. Trong một khối lệnh , dấu 2 chấm chỉ hợp lệ khi dùng làm nhãn (label), do đó JS bị bối rối và báo lỗi cú pháp syntaxError
+ Khi ta bọc trong ngoặc tròn () 
+ const createUser = name =>({ name : name });
+ Dấu ngoặc tròn () ép JS phải coi nội dung bên trong như 1 biểu thức Expression. Vì đây là biểu thức , cặp dấu ngoặc nhọn {} buộc phải được hiểu như là 1 object literal
+Bản chất của Hoisting trong bộ nhớ:
+Hoisting không phải việc JS thực sự di chuyển các dòng code lên đầu chương trình. Đây là cách chúng ta mô tả cơ chế xảy ra khi JS Engine tạo Excution Context và chuẩn bị môi trường thực thi trước khi bắt đầu chạy code
+Khi JS Engine(trình biên dịch JS) chuẩn bị chạy 1 file code , nó luôn trải qua 2 giai đoạn riêng biệt: 
+ 1. Giai đoạn biên dịch / quét khởi tạo (Creation phase): JS Engine quét qua toàn bộ mã nguồn, cấp phát vùng nhớ cho các biến và hàm trước khi bất kỳ dòng code nào thực sự chạy
+ 2. Giai đoạn thực thi (Excution phase) : Chạy mã từ trên xuống dưới theo từng dòng lệnh
+
+
+2. Phạm vi biến (Scope) và Lexical Scoping
+Trong JS hiện đại có 3 cấp độ phạm vi chính được chia ra: 
+ 1. Global Scope: Biến toàn cục là biến được khai báo ở ngoài cùng chương trình, ở bất kỳ đâu cũng truy cập được
+ 2. Function Scope : Biến cục bộ được khai báo bên trong hàm , chỉ hàm đó và các hàm con bên trong nó mới được đọc
+ 3. Block Scope : Biến được khai báo bằng let , const bên trong một cặp ngoặc nhọn {}(như trong if, for , while). Ra ngoài cặp nhọn đó sẽ biến mất.
+
+Lexical Scoping và chuỗi phạm vi Scope Chain
+Khái niệm tiếp theo sẽ là Lexical Scoping (phạm vi từ vựng):
+ - Vị trí mà viết mã nguồn quyết định nơi biến có thể được truy cập
+ - Một hàm hoặc khối nằm bên trong luôn có thể nhìn ra các biến ở phạm vị bên ngoài bao quanh nó
+Khi muốn gọi 1 biến, JS hoạt động như 1 thám tử lần theo Scope Chain:
+ 1. Tìm trong phạm vi hiện tại trước
+ 2. Nếu không tìm thấy, bước ra ngoài phạm vi cha gần nhất để tìm 
+ 3. Tiếp tục tìm ngược lên cho tới Global Scope. Nếu vẫn không có lúc này mới ném ra lỗi ReferenceError.
+
+3. Xử lý linh hoạt tham số của Hàm
+JS rất phóng khoáng với lượng tham số truyền vào hàm:
+Sẽ có 2 trường hợp xảy ra : 
+ 1. Truyền thừa tham số vào hàm --> các tham số thừa sẽ bị bỏ qua
+ 2. Truyền thiếu tham số vào hàm --> các tham số bị thiếu sẽ tự động nhận giá trị undefined
+Để xử lý linh hoạt, ES6 bổ sung 2 công cụ hữu ích: 
+ 1. default parameters ( tham số mặc định ) : cho phép đặt giá trị phòng hờ nếu tham số bị bỏ trống hoặc nhận undefined
+ ex : function hello(name = "khách"){
+    return `xin chào ${name}`;
+ }
+ 2. Rest parameters(... gom tham số): Gom tất cả các tham số còn lại thành 1 mảng 
+ ex function sum(...numbers){
+    // number ở đây là 1 mảng chứa toàn bộ tham số được truyền vào
+ }
+
+4. Closures(bao đóng) 
+Closure là cơ chế nền tảng chi phối cách hoạt động của React đặc biệt là Hook useState.
+Thông thường khi một hàm kết thúc , các biến cục bộ sẽ bị dọn dẹp khỏi bộ nhớ. Nhưng Closure xuất hiện để giải quyết 1 nhu cầu: làm sao để hàm con vẫn dùng được dữ liệu của hàm cha 
+ + Khi hàm con được tạo ra nó tự động gói ghém toàn bộ biến ở phạm vi bên ngoài mà nó tham chiếu đến vào 1 chiếc balo đi kèm.
+ + Khi hàm cha kết thúc thì dùm hàm cha đã biến mất khỏi Call Stack, JS thấy rằng hàm con vẫn cần có biến từ hàm cha mà nó tham chiếu đến , nên nó không xóa biến đó đi 
+ + Bao đóng : hàm con đi đâu , nó mang theo chiếc ba lo chứa biến của hàm cha mà nó đã tham chiếu đến trước đó 
+Vòng đời thông thường của một hàm trên Call Stack
+Khi một hàm được gọi, JS Engine sẽ tạo ra 1 vùng nhớ riêng cho hàm đó gọi là Excution Context hay còn gọi là ngữ cảnh thực thi trên call Stack
+ + Mọi biến cục bộ khai báo bên trong hàm được cấp phát tại Đây
+ + Khi hàm chạy xong và gặp lệnh return, toàn bộ ngữ cảnh này thường sẽ bị đẩy ra khỏi Call Stack và bộ nhớ của nó được dọn dẹp. Các biến cục bộ đó biến mất.
+
+Tuy nhiên, JS chỉ cho phép chúng ta trả về một hàm từ một hàm khác
+
+Cơ chế bộ nhớ tầng sâu : Stack , Heap & Garbage Collection
+Để xây dựng nền tảng vững chắc và đúng bản chất, bây giờ mình sẽ đi sâu vào mô hình hoạt động của Closure dưới gốc độ quản trị bộ nhớ và ứng dụng thực tế
+Trong các ngôn ngữ lập trình, bộ nhớ dành cho chương trình thường chia làm 2 vùng chính: 
+ 1. Call stack (Ngăn xếp cuộc gọi) :
+  + Nơi lưu trữ các ngữ cảnh thực thi Excution Context khi một hàm được gọi
+  + Khi hàm chạy xong lệnh return, khung ngăn xếp Stack Frame đó bị hủy bỏ.
+ 2. Memory heap(vùng nhớ rộng):
+  + Nơi lưu trữ các Object , Function và các giá trị cần tồn tại độc lập với thời gian sống của một hàm cụ thể 
+ex : function createCounter(){
+    let count = 0; // bien cuc bo cua function
+
+    return function(){
+        count++;
+        return count;
+    };
+}
+
+const count = createCounter();
+
+console.log(count());
+
+Khi thực thi lệnh gọi và in count() ra tại sao biến count không bị xóa?
+Trình thu gom rác của JS(Garbage Collector) hoạt động theo thuật toán Mark - and - Sweep: Một vùng nhớ chỉ bị thu hồi khi không còn bất kì đường dẫn nào từ biến toàn cục trỏ đến nó.
+ + Hàm cha createCounter() sau khi hoàn thành sẽ bị xóa khỏi call stack
+ + Tuy nhiên , môi trường biến count được chuyển sang nằm ở vùng nhớ heap.
+ + Vì biến toàn cục count vẫn đang tham chiếu đến hàm con và hàm con lại tham chiếu đến count, nên count luôn ở trạng thái " đang được dùng " và không bao giờ bị dọn dẹp
+
+6. Hàm thuần khiết Pure function và tác dụng phụ side-effects
+
+Khái niệm Pure function : Với cùng một đầu vào luôn trả về cùng 1 đầu ra, không làm thay đổi bất kỳ trạng thái nào bên ngoài. ex: const add = (a , b) => a + b;
+Khái niệm side effects : Bất kì hành vi nào làm thay đổi môi trường bên ngoài phạm vi hàm (ghi log, sửa biến ngoài , gọi API , đổi giao diện DOM). 
+ex : 
+let total = 0;  
+const addAndMutate = (x) => {
+    total += x;
+};
+
+Một pure function phải thỏa mãn 2 điều kiện: 
+ 1. Deterministic
+ cùng input -> và cho ra cùng output.
+ ex:
+ function add (a , b) {
+    return a + b;
+ }
+ add(2 , 3); // 5
+ add(2 , 3); // 5
+ 2. Không tạo side-effects 
+ Không thay đổi giá trị trạng thái bên ngoài hàm
+ ví dụ 
+ let total = 0;
+ function add(value){
+    return total += value;
+ }
+ --> sai điều này làm thay đổi giá trị bên ngoài là total
+ cách sửa lại đúng
+ function add(value , total){
+    return total += value;
+ }
