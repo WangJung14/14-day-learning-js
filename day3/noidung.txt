@@ -1,0 +1,322 @@
+I. Destructuring : giải nén dữ liệu
+1.1 Tại sao lại cần phải Destructuring ?
+Trước khi đi vào bài học mới hãy nhìn lại day3, mình đã được học biến và object trong JS
+Giả sử nếu xây dựng một trang web quản lý sinh viên 
+const student = {
+    name : "Trung",
+    age : 21,
+    major : "Information Technology"
+};
+Đối tượng Student lưu thông tin của sinh viên gồm 3 thuộc tính:
+ - name : tên sinh viên
+ - age : tuổi sinh viên
+ - major : ngành học của sinh viên
+Bây giờ nếu mình muốn lấy tên và tuổi của sinh viên đó hiển thị lên giao diện
+Với những những kiến thức đã học từ bài học trước đó, mình có thể thực hiện như sau:
+const name =  student.name;
+const age = student.age;
+
+console.log(name);
+console.log(age);
+
+--> output sẽ là :
+An 
+20
+Cách này hoàn toàn đúng , không có bị lỗi gì hết. Nhưng tưởng tượng nếu đối tượng có 20 thuộc tính và mình cần phải lấy 10 thuộc tính trong số đó. Với phương pháp như trên bắt buộc mình phải viết nhiều dòng code để truy cập vào từng thuộc tính
+
+Để giải quyết vấn đề đó JS đã cung cấp cho chúng ta 1 giải pháp giúp lấy nhiều giá trị từ cùng một nguồn dữ liệu ngắn gọn hơn
+const {name , age } = student;
+--> Đây chính là Object Destructuring
+
+1.2 Bản chất của Object Destructuring
+Hãy phân tích đoạn code dưới đây 
+const {age , name } = student;
+
+const = student --> một phép khai báo kết hợp giải nén dữ liệu
+student ở đây là nguồn dữ liệu , đây là object chứa những thuộc tính mà chúng ta muốn lấy
+name và age là tên các thuộc tính cần lấy , JS sẽ tìm thuộc tính name và age trong student sau đó sẽ gán giá trị của nó cho biến name và age.
+Về mặt ý nghĩa thì đoạn code ở trên sẽ tương đương với :
+const age = student.age;
+const name = student.name;
+!!!!Nhưng có một điểm cục kỳ quan trọng: Object Destructuring dựa vào tên thuộc tính không dựa vòa vị trí thuộc tính trong object
+const student = {
+  major: "IT",
+  age: 20,
+  name: "Trung"
+};
+const { name, age } = student;
+
+Dù name nằm cuối object nhưng biến name vẫn nhận giá trị là "Trung".
+Vì JS tìm thuộc titnhs bằng tên name , chứ không lấy htuoojc tính đầu tiên hay thứ 2 theo thứ tự khai báo
+--> Đây là điểm khác biệt mà chúng ta cần phải nắm chắc để có thể học tiếp Array Destructuring
+
+1.3 Array Destructuring khác gì với Destructuring Object
+Chúng ta sẽ có 2 đoạn code như sau:
+
+ 1. Array Destructuring:
+    const scores = [8,9,10];
+    const [a,b,c] = scores;
+ 2. Object Destructuring:
+    const student = {
+        name : "Trung",
+        age : 21,
+        major : "IT"
+    };
+
+Với Array thì kết quả trả về sẽ là 
+a // 8
+b // 9
+c // 10
+Nếu mình thay đổi biến a b c thành xyz thì  biến x vẫn có giá trị là 8 và y có giá trị là 9 , z có giá trị là 10
+Điều này cho thấy rằng , Array chỉ quan tâm đến vị trí mà không quan tâm đến tên biến là gì.
+
+Ngược lại với Object thì 
+const { age, name } = student;
+const { name , age } = student;
+Biến age vẫn sẽ trả về là 21 và biến name vẫn sẽ trả về là "Trung" mặc kệ cho việc có thay đổi vị trí trong dấu ngoặc
+!!! Chúng ta có thể dựa vào [] và {} để nhận biết cách JS giải nén cho từng loại dữ liệu.
+
+1.4 Vì sao React dùng Destructuring rất nhiều ?
+Trong React một component có thể nhận dữ liệu từ component cha thông qua props
+Ví dụ: nếu chúng ta có component hiển thị thẻ sinh viên :
+function studentIdCard(props){
+    return(
+        <div>
+            <h2>{props.name}</h2>
+            <p>{props.age}</p>
+        </div>
+    );
+}
+
+khi sử dụng 
+<studentIdCard name "Trung" age={20} />
+
+React sẽ truyền các props vào component dưới dạng 1 object có các thuộc tính tương ứng.
+Vậy trong component mỗi lần muốn lấy tên thì mình phải viết props.name; muốn lấy tuổi thì viết props.age.
+Với destructuring thì ta có thể viết:
+function StudentCard({ name, age }) {
+  return (
+    <div>
+      <h2>{name}</h2>
+      <p>{age}</p>
+    </div>
+  );
+}
+Hai cách đều có thể cho ra giao diện tương ứng với nhau
+Nhưng cách thứ 2 sẽ giúp chúng ta thấy ngay component đang sử dụng những dữ liệu nào.
+
+Vậy còn useState ?
+Thông thường thì mình có thể thấy cú pháp sau:
+const [ count , setCount ] = useState(0);
+Nếu đã hiểu được bản chất của Array Destructuring ở trên thì dòng code này sẽ không còn khó hiểu nữa
+Hàm useState(0) trả về một mảng gồm 2 phần tử : giá trị của state hiện tại và hàm dùng để cập nhật state
+Ta có thể tưởng tượng kết quả như sau:
+[0,someSetterFunction]
+Vì vậy :
+ - count nhận phần tử ở vị trí thứ nhất , tức là giá trị state
+ - setCount nhận phần tử ở vị trí thứ 2 , tức là hàm cập nhật state
+
+Take note !!!:
+
+Ở phần học này cần nhớ 3 quy tăc:
+ 1. Object Destructuring dựa vào tên thuộc tính không dựa vào thứ tự khai báo. ex : const { name , age } = student;
+ 2. Array Destructuring dựa vào giá trị phần tử trong mảng. ex: const [ first , second ] = number;
+ 3. Renaming : cú pháp propertyName : variableName cho phép lấy thuộc itnhs bằng tên cũ và lưu giá trị vào biến có tên mới. Ex : const { name : fullName } = student;
+
+1.5 Default Values: Giá trị mặc định 
+Đây là một phần rất quan trọng, đặc biệt khi em làm việc với dữ liệu từ API hoặc nhận props trong React.
+
+Chúng ta sẽ có tình huống thực tế nhưu sau :
+Giả sử mình đang xây 1 trang thể hiện thông tin của cuốn sách:
+const book = {
+    title : "How to learn Javascript in 14 day",
+    price : 10,
+};
+console.log(book.author);
+--> kết quả sẽ hiện ra là undefined
+??? tại sao 
+Để giải thích cho vấn đề trên: Bởi vì object book không có thuộc tính author. JS không tự tạo ra thuộc tính đó , cũng không tự suy đoán tác giả là ai. Khi đọc 1 thuộc tính không tồn tại thì kết quả trả về sẽ là undefined
+
+Nhưng trong thực tế , mình sẽ muốn hiện thị "Unknown" nếu chưa có thông tin tác giả. Để làm được như vậy thông thường mình sẽ làm như sau
+
+const author = book.author === undefined ? "Unknown" : book.author;
+
+Đoạn code ở trên sẽ hoạt động , nhưng quá dài dòng và nếu có nhiều thuộc tính cần phải gán giá trị mặc định thì rất tốn thời gian
+
+JS cho phép viết ngắn hơn bằng Default Values trong Destructuring:
+
+const { author  = "Unknown" } = book;
+console.log(author);
+--> Kết quả lúc này sẽ là Unknown.
+
+1.6 Bản chất của dấu = trong Default Values:
+Hãy quan sát đoạn code dưới đây:
+const { author = "Unknown" } = book;
+Đoạn code trên sẽ có 2 dấu bằng mang 2 vai trò khác nhau về mặt cú pháp :
+ 1. Dấu = sau author chỉ định giá trị mặc định cho biến giải nén.
+ 2. Dấu = cuối cùng sau book xác định object nguồn được dùng để giải nén.
+Điểm quan trọng nhất:
+ - Giá trị mặc định trong Destructuring chỉ được sử dụng khi giá trị lấy ra là undefined.
+ - Nó không có nghĩa là cứ giá trị trống, giá trị 0 hay false thì JavaScript sẽ thay bằng giá trị mặc định.
+
+1.7 Liên hệ với React 
+Giả sử component nhận thông tin của người dùng 
+
+    function UserCard({ name, status = "active" }) {
+        return (
+            <div>
+            <h2>{name}</h2>
+            <p>{status}</p>
+            </div>
+        );
+    }
+Nếu component được sử dụng như sau :
+<UserCard name = "Trung" />
+Thì Status sẽ nhận giá trị "active" vì props không cung cấp thuộc tính status, nên giá trị nhận được là undefined.
+
+Nhưng nếu như mình truyền vào
+<UserCard name = "Trung" status={false} />
+Thì lúc này status sẽ nhận giá trị là false chứ không phải active
+
+Đây là một lợi ích quang trọng của Default Values. Mình có thể tự gán giá trị cho các dữ liệu bị thiếu mà không vô tình ghi đè các giá trị hợp lệ như false và 0.
+
+II Nesting Destructuring - phá hủy lồng nhau 
+1. Tại sao chúng ta lại cần Nested Destructuring ?
+Ở nội dung trước , mình đã biết cách lấy thuộc tính từ 1 object. Nhưng trong dự án thực tế, dữ liệu thường sẽ không đơn giản như vậy. Một object có thể chứa object khác hoặc chứa mảng các object
+Ví dụ, 1 API trả về thông tin sinh viên:
+
+const student = {
+    name : "Trung",
+    age : 20,
+    address : {
+        city : "TP.HCM",
+        district : "District 12"
+    }
+};
+Giả sử ở đây mình muốn lấy city thình mình có thể viết 
+const city = student.address.city;
+
+console.log(city); // "Ho Chi Minh City"
+
+Cách này hoàn toàn đúng. Tuy nhiên, khi cần lấy nhiều thuộc tính lồng nhau, mình có thể dùng Nested Destructuring để lấy chúng trực tiếp từ cấu trúc dữ liệu.
+2. Nested Object Destructuring:
+Ta có đoạn code : 
+
+const student = {
+  name: "An",
+  age: 20,
+  address: {
+    city: "Ho Chi Minh City",
+    district: "District 1"
+  }
+};
+
+const {
+  address: { city }
+} = student;
+
+console.log(city); // "Ho Chi Minh City"
+
+Lần đầu nhìn có thể thấy đoạn code khó đọc nhưng mình sẽ phần tích từng bước 
+ Bước 1 : đọc cấu trúc object 
+ student :
+  - address :
+    - city
+    - district
+ address là một thuộc tính của student , nhưng giá trị của address lại là một object khác
+ Bước 2 : đọc cấu trúc destructuring:
+  const {
+    address : { city }
+  } = student;
+ 
+ Hãy đọc code theo thứ tự:
+    1. Lấy thuộc tính address từ object student.
+    2. Bên trong address, lấy thuộc tính city.
+    3. Tạo biến city để nhận giá trị đó.
+ Kết quả : console.log(city); // "Ho Chi Minh city"
+ Điều quan trọng : cú pháp address : { city } không tạo biến address. Nó đi sâu vào object address để lấy city
+
+3. Nested Destructuring kết hợp Renaming:
+Chúng ta đã học cú pháp đổi tên:
+const { name: fullName } = student;
+
+
+Bây giờ kết hợp với object lồng nhau:
+const student = {
+  name: "Trung",
+  address: {
+    city: "Ho Chi Minh City"
+  }
+};
+
+const {
+  name: fullName,
+  address: { city: cityName }
+} = student;
+
+console.log(fullName); // "Trung"
+console.log(cityName); // "Ho Chi Minh City"
+
+
+Có hai thao tác đổi tên ở đây:
+ - name: fullName: lấy student.name, tạo biến fullName.
+ - city: cityName: lấy student.address.city, tạo biến cityName.
+Tên thuộc tính gốc không thay đổi. Object student cũng không bị sửa đổi.
+
+4. Nested Destructuring với mảng bên trong object 
+Dư liệu API có thể chứa mảng :
+const course = {
+    title : "How to learn JS in 14 day",
+    instructor : {
+        name : "Trung"
+    },
+    student : ["Ronaldo","Messi","Neymar"]
+};
+
+Giả sử ở đây mình muốn lấy tên giảng viên và sinh viên đầu tiên 
+const {
+    instructor : { name : instructorName },
+    student : [firstStudent]
+} = course;
+
+console.log(instructorName); // Trung
+console.log(firstStudent); // Ronaldo
+Như vậy mình có thể nhận ra được là , có 2 kiểu cấu trúc xuất hiện ở đây: 
+ 1. Dấu ngoặc nhọn {...} dùng để destructuring object theo tên thuộc tính 
+ 2. Dấu ngoặc vuông [...] dùng để destructuring Array theo vị trí.
+Khi chúng lồng vào nhau,mình chỉ cần nhìn cấu trúc dữ liệu để xác định cú pháp tương ứng.
+
+5. Nested Destructuring kết hợp Default Values
+Đây là phần ứng dụng trực tiếp kiến thức vừa học ở bài trước:
+
+Cho đoạn code : 
+const user = {
+  profile: {
+    name: "An"
+  }
+};
+
+const {
+  profile: {
+    name,
+    city = "Unknown"
+  } = {}
+} = user;
+
+console.log(name); // "An"
+console.log(city); // "Unknown"
+
+ở đây, city không tồn tại trong profile, nên giá trị mặc định "Unknown" được sử dụng
+Nhưng chúng ta phải cẩn thận: Default Value cho thuộc tính bên trong không tự bảo vệ khi object cha bị thiếu 
+Ex : 
+ const user = {};
+ const {
+    profile : {
+        name = "Guest"
+    } = {}
+ } = user;
+
+ console.log(name) // Guest
+
+ Phần profile = {} bảo vệ trường hợp user.profile là undefined. Sau đó name = "Guest" xử lý trường hợp profile.name là undefined
+ nếu bỏ = {} ở profile, JS sẽ báo lỗi khi cố destructuring thuộc tính bên tron profile đang là undefined.
