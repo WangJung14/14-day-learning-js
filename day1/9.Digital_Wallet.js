@@ -258,3 +258,26 @@ Template Literals
 Functions
 Cập nhật trạng thái của chương trình
 */
+
+
+let balance = 2000000;
+let dailySpent = 500000;
+
+const dailyLimit = 5000000;
+const transactionFee = 1000;
+
+
+
+
+
+/*
+Rule:
+1.Không được giao dịch số tiền <= 0.
+2.Không được rút số tiền lớn hơn balance.
+3.Tổng số tiền đã chi trong ngày không được vượt quá dailyLimit.
+4.Transfer phải tính thêm transactionFee.
+5.Balance không được âm.
+6.Sau mỗi giao dịch hợp lệ phải cập nhật lại balance.
+7.Nếu giao dịch thất bại, balance không được thay đổi.
+*/
+

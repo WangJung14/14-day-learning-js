@@ -320,3 +320,503 @@ Ex :
 
  Phần profile = {} bảo vệ trường hợp user.profile là undefined. Sau đó name = "Guest" xử lý trường hợp profile.name là undefined
  nếu bỏ = {} ở profile, JS sẽ báo lỗi khi cố destructuring thuộc tính bên tron profile đang là undefined.
+
+ 6. Function parameters Destructuring
+ 1. Vấn đề : khi một hàm nhận object: 
+ Giả sử chúng ta đang xây dựng hàm hiển thị thông tin của 1 sinh viên 
+ const student = {
+  name : "Trung",
+  age : 21,
+  major : "IT",
+ };
+
+ function displayStudent(student){
+  console.log(student.name);
+  console.log(student.age);
+  console.log(student.major);
+ }
+
+ displayStudent(student);
+ 
+ Code sẽ chạy bình thường. Nhưng chúng ta phải viết student.name , student.age,.. mỗi khi muốn sử dụng dữ liệu
+ Vấn đề sẽ xảy ra nếu như hàm nhận nhiều thuộc tính hơn thì lúc bây giờ code sẽ trở nên dài dòng
+ --> Để giải quyết vấn đề này JS cho phép destructuring ngay tại tham số của hàm để lấy các thuộc tính cần thiết
+
+ 2.Cách viết Function Parameter Destructuring 
+ Bây giờ ta sẽ viết lại đoạn code xây dựng hàm hiển thị thông tin của 1 sinh viên như trên nhưng lúc này sẽ sử dụng Parameter Destructuring
+
+ const student = {
+  name : "Trung",
+  age : 21,
+  major : "IT",
+ };
+
+ function displayStudent({name , age , major}){
+  console.log(name);
+  console.log(age);
+  console.log(major);
+ } 
+
+ displayStudent(student);
+ --> 2 output đều giống nhau nhưng với Parameter Destructuring thay vì nhận object vào một tham số tên student, hàm destructuring trực tiếp nhận object được truyền vào là các biến name , age , major sử dụng bên trong hàm.
+
+ 3. Tham số destructuring không phải object mới
+ Đây là điểm chúng ta cần phải hiểu sâu
+ Khi gọi displayStudent(student);
+ Chúng ta đang truyền vào cho cả object student cho Hàm
+ Hàm : 
+ function displayStudent({ name, age }) {
+    console.log(name);
+    console.log(age);
+ }
+ Có thể hiểu tương đương về mặt ý tưởng như sau:
+ function displayStudent(student) {
+    const { name, age } = student;
+
+    console.log(name);
+    console.log(age);
+}
+Cách viết này giúp chúng ta thấy rõ hơn: Function Parameter Destructuring thực chất là áp dụng quy tắc destructuring ngay tại vị trí khai báo tham số 
+!!! Lưu ý: Cú pháp này không có nghĩa là chúng ta truyền hai tham số riêng biệt. Thật chất chúng ta vẫn truyền một object duy nhất.
+displayStudent(student); // Đúng
+displayStudent(student.name, student.age); // Đây là cách truyền hai đối số riêng
+--> 2 cách gọi ở trên có cấu trúc khác nhau
+ 4.Đổi tên biến trong tham số hàm 
+ Ở phần trên chúng ta đã được học cú pháp:
+ const { name : studentName } = student;
+ khi đưa vào Function Parameter , quy tắc vẫn y nguyên:
+ const student = {
+  name : "Trung",
+  age : 21
+ };
+ function displayStudent({ name : studentName , age }){
+  console.log(studentName);
+  console.log(age);
+ }
+ displayStudent(student);
+ Trong hàm này :
+  - name là tên thuộc tính cần Lấy
+  - studentName là biến cục bộ được tạo 
+  - age vừa là tên thuộc tính vừa là tên biến 
+--> vì vậy nếu chúng ta viết console.log(name) trong hàm thì sẽ báo lỗi nếu không có biến name nào khác trong phạm vi truy cập. Biến được tạo từ thuộc tính name ở đây là studentName
+
+ 5. Kết hợp Default Value trong function Parameter:
+ Ở phần này chúng ta sẽ kết hợp trực tiếp với bài Default Value đã học ở trên:
+ function createUser({
+  name = "Guest",
+  role = "User",
+ }){
+  console.log(name);
+  console.log(role);
+ }
+ 
+ createUser({
+  name : "Trung"
+ });
+
+ --> Kết quả sẽ là:
+ Trung 
+ User 
+ Giải thích :
+ - name có giá trị là Trung, nên giữ nguyên
+ - role không có trong object được truyền vào , nên nó là undefined vì vậy sẽ lấy giá trị mặc đinh "user".
+
+ Chúng ta cũng có thể áp dụng Default Value để hỗ trợ trường hợp không truyền đối số nào vào hàm :
+ function createUser({
+  name = "Trung",
+  role = "Guest"
+ } = {}) {
+  console.log(name);
+  console.log(role);
+ }
+ createUser();
+
+ --> Kết quả sẽ là :
+ Trung 
+ Guest
+
+ ??? Tại sao lại cần dùng = {} ở ngoài cùng
+ Vì nếu gọi createUser() mà không có đối số , tham số sẽ nhận undefined. JS không thể destructuring các thuộc tính của undefined
+ cú pháp : 
+ function createUser({ name = "Trung" } ={})
+ có hai lớp Default Values khác nhau:
+ 1. ={} : giá trị mặc định cho toàn bộ tham số
+ 2. name = "Guest": giá trị mặc định cho thuộc tính name
+ Đây là một ứng dụng rất hữu ích khi xây dựng hàm có nhiều tùy chọn
+
+ 6. Tại sao React sử dụng cú pháp này nhiều ?
+ Trung React, component thường nhận dữ liệu từ props
+
+ ví dụ : 
+ function userIdCard(props){
+  return <h2>{props.name}</h2>
+ }
+ 
+ ta có thể viết 
+ function userIdCard({ name , age }){
+  return (
+    <div> 
+      <h2>{name}</h2>
+      <p>{age}</p>
+    </div>
+  );
+ }
+ 
+ Khi sử dụng :
+ <UserCard name = "Trung" age = {20} />
+
+ React truyền object props vào component, còn destructuring giúp chúng ta lấy trực tiếp name và age
+
+ Vì vậy khi gặp cú pháp :
+ function Component({ title , dedescription }){
+  // ...
+ }
+ Hãy nhớ rằng đây chính là Function Parameter Destructuring không phải là một cú pháp riêng của React.
+
+III. Spread Operator(...) và Rest Parameter(...)
+1. Trước tiên : Tại sao JS lại có ... ?
+Hãy tưởng tượng chúng ta đang có 1 chiếc hộp chứa 3 loại quả: Apple, Banana, Orange
+ - Với Spread chúng ta sẽ mở hộp lấy từng loại quả ra Apple + Banana + Orange
+ - Với Rest chúng ta sẽ gom các loại quả này thành 1 nhóm [Apple , Banana , Orange]
+ --> Có thể hiểu đơn giản Spread là trãi ra còn Rest là thu gom 
+ Đây là cách hình dung ban đầu:
+  - Spread Operator : Trải các phần tử của một iterable hoặc các thuộc tính của một object ra
+  - Rest Parameter/ Rest syntax : Gom nhiều giá trị hoặc thuộc tính còn lại vào 1 biến 
+  Cả 2 đều dùng dấu ... Điểm khác biệt nằm ở vị trí xuất hiện và nhiệm vụ mà nó thực hiện chứ không phải ở ký hiệu.
+2. Spread Operator - Trải các phần tử ra
+ 2.1 Spread với Array
+ Giả sử chúng ta có 1 mảng:
+ const fruits = ["Apple" ,"Banana","Orange"];
+ console.log(fruits);
+ ==> Kết quả : ["Apple", "Banana", "Orange"]
+ Bây giờ nếu chúng ta viết 
+ console.log(...fruits);
+ Kết quả sẽ là Apple Banana Orange
+ tại sao lại như vậy ?
+ Khi viết ...fruits trong lời gọi hàm, JS trải các phần tử của mảng thành những đối số riêng biệt. Về mặt ý tưởng, câu lệnh trên tương đương với
+ console.log("Apple", "Banana", "Orange");
+ !!! Chú ý : Spread không phải là 1 vòng lặp và cũng không phải là một hàm. Nó là cú pháp của JS để trải các phần tử ra tại vị trí được phép sử dụng
+
+ 2.2 Spread để sao chép mảng
+ Đây là một ứng dụng rất quan trọng trong lập trình thực tế:
+ const original = [10,20,30];
+
+ const copied = [...original];
+ console.log(copied);
+ ==> Output sẽ là [10, 20, 30]
+
+ [...original] tạo ra một mảng mới có các phần tử giống nhau ban đầu
+ original[10,20,30] -> Spread các phần tử sang mảng mới -> copied[10,20,30]
+ --> 2 mảng này có nội dung giống nhau nhưng là 2 mảng khác nhau
+ Để kiểm chứng
+  const original = [10, 20, 30];
+  const copied = [...original];
+
+  console.log(original === copied); // false
+
+  copied.push(40);
+
+  console.log(original); // [10, 20, 30]
+  console.log(copied);  // [10, 20, 30, 40]
+
+  Tại sao original === copied lại trả về false ? Vì với Array, phép so sánh === kiểm tra xem hai biến có tham chiếu đến cùng một object không. Hai mảng được tạo riêng biệt nên chúng khác nhau
+
+  !!! Lưu ý quan trọng: Spread tạo bản sang nông(shallow copy). Nếu mảng chứa các object hoặc mảng lồng nhau, những object lồng bên trong vẫn có thể được dùng chung giữa 2 mảng. Chúng ta sẽ quay lại phần này sau.
+
+  2.3 Spread để gộp nhiều mảng
+  Giả sử chúng ta đang có 2 danh sách sinh viên của 2 lớp:
+
+  const classA = ["An", "Bình"];
+  const classB = ["Chi", "Dũng"];
+
+  const allStudents = [...classA, ...classB];
+
+  console.log(allStudents);
+
+  ==> Kết quả ["An", "Bình", "Chi", "Dũng"]
+  Hãy so sánh 2 cách viết:
+  // Cách 1: Sử dụng Spread
+  const result1 = [...classA, ...classB];
+
+  // Cách 2: Viết trực tiếp các phần tử
+  const result2 = ["An", "Bình", "Chi", "Dũng"];
+  Cả 2 cách đều tạo ra mảng có cùng nội dung. Tuy nhiên cách thứ nhất tiện hơn khi dữ liệu đến từ các biến và có thể thay đổi theo thời gian.
+  Chúng ta cũng có thể thêm mới phần tử ở đầu hoặc cuối 
+  const numbers = [2, 3, 4];
+
+  const result = [1, ...numbers, 5];
+
+  console.log(result);
+  // [1, 2, 3, 4, 5]
+
+  Ứng dụng thực tế : Gộp danh sách dữ liệu lấy từ API, tạo mảng mới khi cập nhật state trong React hoặc bổ sung phần tử mà không thay đổi mảng ban đầu
+
+  2.4 Spread với Object
+  Spread không chỉ dùng cho Array. Với Object, nó giúp sao chép và kết hợp các thuộc tính.
+
+  const user = {
+    name : "Trung",
+    age : 21
+  };
+
+  const copiedUser = {...user};
+  console.log(copiedUser);
+  // { name: "Minh", age: 21 }
+
+  console.log(user === copiedUser);
+  // false
+
+  muốn thêm thuộc tính mới thì sao ?
+
+  const updateUser = {
+    ...user,
+    city : "Da Nang"
+  };
+
+  console.log(updateUser);
+  // { name: "Minh", age: 21, city: "Da Nang" }
+
+  Điểm hay là không cần viết hết lại các thuộc tính cũ 
+  Nhưng nếu 2 object có cùng 1 thuộc tính thì sao ?
+
+  const defaultConfig = {
+    theme : "light",
+    language : "vi"
+  };
+
+  const userConfig = {
+    theme : "dark"
+  };
+
+  const config = {
+  ...defaultConfig,
+  ...userConfig
+ };
+
+  console.log(config);
+  ==> kết quả sẽ là 
+  {
+    theme: "dark",
+    language: "vi"
+  }
+  Tại sao theme là "dark" không phải là "light"?
+  Vì khi trải object vào một object mới , nếu thuộc tính được cung cấp nhiều lần thì giá trị xuất hiện sau sẽ ghi đè giá trị trước
+  Cũng vì quy tắc này nên thứ tự viết spread rất quan trọng :
+  const config = {
+    ...userConfig,
+    ...defaultConfig
+  };
+  Ở đây theme sẽ là "light" vì defaultConfig xuất hiện sau.
+
+  3.Rest parameters - gom các đối số loại
+  Bây giờ chúng ta hãy chuyển sang phần thứ 2. Ở trên mình đã biết Spread dùng để trãi các phần tử ra. Vậy nếu 1 hàm cần nhận số lượng đối số không cố định thì sao?
+
+  3.1 Vấn đề trước khi dùng Rest Parameter
+  Giẳ sửa muốn viết 1 hàm tính tổng :
+
+  function sum (a , b) {
+    return a + b;
+  }
+
+  console.log(sum(10,20));
+  console.log(sum(10,20,30));
+
+  Ở lời gọi hàm thứ hai , chúng ta truyền vào 3 đối số nhưng chỉ khai báo a và b. Đối số thứ ba không được đưa vào phép tính
+  Vậy nếu muốn hàm nhận được 2 3 5 hoặc 100 tham số thì sao?
+
+  3.2 Giải pháp với Rest Parameters 
+  function(...numbers){
+    console.log(numbers);
+  }
+  sum(10,20,30);
+  
+  ==> kết quả [10, 20, 30]
+  Đây là điểm khác biệt quan trong ...numbers trong danh sách tham số của hàm sẽ gom tất cả các đối số còn lại thành một mảng tên numbers
+  Giờ thì mình có thể tính tổng:
+  function sum(...numbers){
+    let total = 0;
+
+    for(const number of numbers){
+      total += number;
+    }
+    
+    return total;
+  }
+  console.log(sum(10, 20));          // 30
+  console.log(sum(10, 20, 30));      // 60
+  console.log(sum(1, 2, 3, 4, 5));   // 15
+  console.log(sum());                // 0
+  Hàm sum không cần biết trước số lượng đối số. Nó nhận chúng dưới dạng mảng rồi duyệt qua để tính tổng
+
+  3.3 Kết hợp tham số thông thường với Rest 
+  Đây là dạng thường sẽ gặp trong bài tập:
+
+  function introduce(role, ...skills) {
+  console.log(`Role: ${role}`);
+  console.log(`Skills: ${skills}`);
+  }
+
+  introduce("Developer", "JavaScript", "C#", "SQL");
+  ==> Kết quả :
+  Role : Developer
+  Skills : JavaScript,C#,SQL
+
+  Phân tích lời gọi hàm :
+  Đối số 1 : role nhận "Developer"
+  Còn lại : ...skills gom "JavaScript", "C#" và "SQL" vào mảng skills.
+ 
+  !!! Có một quy tắc rất quan trọng Rest parameter phải là tham số cuối cùng của hàm.
+  // Hợp lệ
+  function test(first, ...rest) {}
+
+  // Không hợp lệ
+  // function test(...rest, last) {}
+  ==> Lý do: JavaScript cần xác định rõ từ vị trí nào trở đi các đối số được gom vào mảng rest.
+
+  4. Rest trong Destructuring
+  Sau khi vừa học Nested Destructuring và Object Destructuring ở phần trước. Rest cũng có thể kết hợp với những kiến trúc đó
+
+  4.1 Rest với Array
+  const numbers = [10, 20, 30, 40, 50];
+
+  const [first, second, ...others] = numbers;
+
+  console.log(first);  // 10
+  console.log(second); // 20
+  console.log(others); // [30, 40, 50]
+  Cách đọc:
+  - first nhận phần tử đầu tiên.
+  - second nhận phần tử thứ hai.
+  - ...others gom tất cả phần tử còn lại vào một mảng.
+  Chú ý: others là một mảng, không phải một giá trị đơn.
+  4.2 Rest với Object 
+  const student = {
+    id: 101,
+    name: "Minh",
+    age: 21,
+    city: "Da Nang"
+  };
+
+  const { name, ...otherInfo } = student;
+
+  console.log(name);
+  // "Minh"
+
+  console.log(otherInfo);
+  // { id: 101, age: 21, city: "Da Nang" }
+
+  Ở đây name được lấy riêng ra, còn ...otherInfo gom tất cả thuộc tính chưa được lấy ra thành một Object mới 
+
+  Đây là cách hữu ích khi chúng ta muốn tách một thuộc tính nhưng vẫn giữ các thuộc tính còn lại.
+
+  Ví dụ, chúng ta muốn bỏ password khỏi một Object trước khi gửi thông tin khác cho giao diện:
+
+  const user = {
+    username: "minh123",
+    password: "secret",
+    email: "minh@example.com"
+  };
+
+  const { password, ...publicUser } = user;
+
+  console.log(publicUser);
+  // {
+  //   username: "minh123",
+  //   email: "minh@example.com"
+  // }
+  !!! Lưu ý: Đây là ví dụ về thao tác dữ liệu phía JavaScript, không thay thế các biện pháp bảo mật ở server
+
+  5. Phân biệt Spread và Rest - Phần cốt lõi  
+    Spread Operator
+    Trải ra
+    const numbers = [1, 2, 3];
+
+    const copy = [...numbers];
+
+
+    Một mảng được trải các phần tử vào mảng mới.
+
+
+    Rest Parameters
+    Gom lại
+    function collect(...numbers) {
+      return numbers;
+    }
+
+    collect(1, 2, 3);
+
+
+    Nhiều đối số được gom thành một mảng.
+
+
+    Rest trong Destructuring
+    Gom phần còn lại
+    const [first, ...others] = [1, 2, 3];
+
+
+    Lấy phần tử đầu tiên riêng ra, gom phần còn lại thành mảng.
+
+    Tổng kết:
+    Spread :
+     + Ý nghĩa : trải dữ liệu ra
+     + Trong lời gọi hàm : trải mảng thành các đối số
+    Rest : 
+     + Ý nghĩa : gom dữ liệu thành mảng
+     + Trong khai báo hàm : Gom các đối số vào mảng 
+     + Trong destructuring : Gom các phần tử hoặc thuộc tính còn lại.
+
+    Ví dụ để nhớ lâu :
+    const players = ["Ronaldo","Messi","Neymar"];
+
+    // Spread trải mảng ra thành các đối số 
+    Math.max(...players); // 3
+
+    // Rest gom các đối số thành một mảng
+    function getPlayers(...values){
+      return values;
+    }
+
+    getPlayers("Trung","Vũ","Liêm"); // ["Trung","Vũ","Liêm"]
+
+    Tips and tricks : ĐỪng cố gắng nhớ ... lúc nào cũng có một ý nghĩa cố định. Hãy nhìn vào vị trí nó xuất hiện để xác định nó đang thực hiện nhiệm vụ gì.
+
+    6. Những lỗi newbie thường gặp
+    Lỗi 1: Nhầm Spread với việc sao chép sâu
+    const original = {
+      profile: {
+        name: "An"
+      }
+    };
+
+    const copy = { ...original };
+
+    copy.profile.name = "Bình";
+
+    console.log(original.profile.name);
+    // "Bình"
+
+
+    Tại sao lại như vậy? Spread chỉ sao chép nông. Object profile bên trong vẫn được tham chiếu chung giữa hai object.
+    Lỗi 2: Đặt Rest Parameter sai vị trí
+    // Sai cú pháp:
+    // function example(...values, last) {}
+
+
+    Rest Parameter phải ở cuối danh sách tham số.
+    Lỗi 3: Nghĩ rằng Rest trong destructuring lấy phần tử cuối
+    const [first, ...rest] = [10, 20, 30, 40];
+
+    console.log(rest);
+    // [20, 30, 40]
+
+
+    rest lấy các phần tử còn lại sau vị trí đã được destructure, không phải chỉ lấy phần tử cuối.
+    Lỗi 4: Quên thứ tự ghi đè của Spread Object
+    const a = { theme: "light" };
+    const b = { theme: "dark" };
+
+    console.log({ ...a, ...b }.theme); // "dark"
+    console.log({ ...b, ...a }.theme); // "light"
+
+
+    Thứ tự Spread có thể thay đổi kết quả.
