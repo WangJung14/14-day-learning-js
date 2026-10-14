@@ -1,0 +1,212 @@
+I. Array
+1.1 Array là gì ?
+- Array(mảng) là một cấu trúc dữ liệu dùng để lưu trữ nhiều giá trị trong cùng một biến theo thứ tự.
+
+const scores = [8, 9, 10];
+
+console.log(scores[0]); // 8
+console.log(scores[1]); // 9
+console.log(scores[2]); // 10
+console.log(scores.length); // 3
+
+Có ba điều chúng ta cần nắm chắc:
+- Index bắt đầu từ 0, không phải 1.
+- scores.length trả về số lượng phần tử.
+- Array có thứ tự, nên vị trí các phần tử rất quan trọng.
+Trong ứng dụng thực tế, Array thường dùng để biểu diễn danh sách sinh viên, sản phẩm, đơn hàng hoặc dữ liệu trả về từ API.
+Ex : 
+const students = [
+  { id: 1, name: "An", score: 8 },
+  { id: 2, name: "Bình", score: 9 },
+  { id: 3, name: "Chi", score: 7 }
+];
+Ở đây, students là một Array chứa ba Object. Cấu trúc dữ liệu lồng nhau như vậy xuất hiện rất thường xuyên khi làm Backend và Frontend.
+1.2. Hai nhóm phương thức Array chúng ta cần phân biệt
+Điểm quan trọng hơn việc ghi nhớ tên phương thức là phải biết thao tác nào làm thay đổi mảng gốc.
++ Nhóm A — Thay đổi mảng gốc (mutating):
+ 1. push() - thêm phần tử vào cuối mảng
+ 2. pop() - xóa phần tử ở cuối mảng 
+ 3. shift() - xóa phần tử đầu mảng 
+ 4. unshift() - thêm phần tử vaod đầu mảng
+
+ ==> các phương thức này trực tiếp thay đổi Array đang được gọi 
++ Nhóm B - Không thay đổi mảng gốc trong cách dùng thông thường:
+ 1.slice(start , end ) - lấy 1 phần của mảng để tạo mảng mới, không lấy vị trí end
+ 2. indexOf() - Trả về vị trí xuất hiện đầu tiên của giá trị , trả về -1 nếu không tìm thấy
+ 3. includes() - Kiểm tra mảng có chứa giá trị không , trả về true false
+ ==> Chúng trả về một phần mảng, vị trí hoặc kết quả kiểm tra mà không sửa Array ban đầu.
+!!! Lưu ý: slice() trả về một mảng mới nhưng chỉ sao chép nông nếu phần tử là Object. Chúng ta sẽ học kỹ điều này ở phần Reference và Immutability.
+1.3 Ví dụ với push() và slice()
+
+1. Push()
+ ex :
+    const numbers = [1,2,3];
+    numbers.push(4);
+    console.log(numbers); // [1,2,3,4]
+
+     ==> push(4) thêm phần tử 4 vào cuối mảng và thay đổi chính numbers
+2. slice() 
+    const numbers = [1, 2, 3];
+
+    const copied = numbers.slice();
+
+    copied.push(4);
+
+    console.log(numbers); // [1, 2, 3]
+    console.log(copied);  // [1, 2, 3, 4]
+    
+    ==>slice() tạo một array mới. Vì vậy, thêm phần tử vào copied không làm thay đổi độ dài của numbers
+Đây là bước đầu tiên để hiểu Immutability: thay vì sửa trực tiếp dữ liệu đang có, ta có thể tạo ra một phiên bản mới đã được cập nhật. 
+
+II. Object - cấu trúc key-value
+Bây giờ chúng ta chuyển sang Object. Đây là cấu trúc dữ liệu cực kỳ quan trọng vì dữ liệu từ REST API, cấu hình ứng dụng và thông tin người dùng thường được biểu diễn dưới dạng Object trong JavaScript.
+2.1 Object là gì ?
+Object lưu trữ dữ liệu theo cặp key-value(khóa và giá trị)
+const student = {
+  name: "An",
+  age: 20,
+  score: 8.5
+};
+
+Trong ví dụ này:
+- name, age, score là các key (tên thuộc tính).
+- "An", 20, 8.5 là các value (giá trị).
+Giá trị của Object không nhất thiết chỉ là chuỗi hoặc số. Nó còn có thể là Array, Object khác hoặc function.
+2.2 Hai cách truy cập thuộc tính:
+ 1. Dot notation(.)
+ Dùng khi tên thuộc tính đã biết và có thể viết trực tiếp
+ console.log(student.name);  // "An"
+ console.log(student.score); // 8.5
+ 2. Bracket notation([])
+ Dùng khi tên thuộc tính được lưu trong một biến hoặc có ký tự đặc biệt 
+ const key = "name";
+ console.log(student[key]); // An
+ !!! Lưu ý : student[key] lấy giá trị của biến key, con student.key tìm thuộc tính có tên đúng là key
+ Ví dụ để thấy được sự khác biệt :
+
+ const student = {
+  name : "An",
+  key : "Gia tri cua thuoc tinh key"
+ };
+
+ const name = "key";
+
+ console.log(student[key]); // An
+ console.log(student.key); // "Gia tri cua thuoc tinh key"
+
+ ==> Đây là lỗi người mới thường mắc phải 
+ 2.3 Thêm , sửa , xóa thuộc tính của Object 
+ Giả sử chúng ta xây dựng ứng dụng quản lý sinh viên. Có 1 object như sau:
+ const student = {
+  name : "Trung",
+  age : 20
+ };
+ Trong quá trình sử dụng ứng dụng, chúng ta cần bổ sung email, cập nhật tuổi hoặc xóa 1 thuộc tính
+
+  1.Thêm thuộc tính 
+  Dùng dấu chấm hoặc ngoặc vuông để gán giá trị cho một thuộc tính chưa tồn tại.
+  student.email = "quangtrung@gmail.com";
+  console.log(student);
+
+  ==> kết quả :
+  {
+    name : "Trung",
+    age : 20,
+    email :"quangtrung@gmail.com"
+  }
+  
+  2. Sửa thuộc tính 
+  Nếu thuộc tính đã tồn tại, phép gán sẽ cập nhật giá trị cho nó 
+  student.age = 21;
+  console.log(student.age); // 21
+
+  3. Xóa thuộc tính
+  Dùng từ khóa delete:
+  delete student.age;
+  console.log(student);
+
+  ==> kết quả :
+  {
+    name : "Trung",
+    email : "quangtrung@gmail.com"
+  }
+
+  !!! Lưu ý quan trọng : Cả ba thao tác trên đều sửa trực tiếp Object ban đầu. Đây là kiểu thao tác có mutation, chúng ta sẽ phân tích kỹ ở phần Immutability
+  !!! const không có nghĩa là object không thể thay đổi , vì const sẽ ngăn chúng ta gán lại biến sang một object khác, nhưng không ngăn thay đổi các thuộc tính của object hiện tại.
+
+III. Reference vs Value :
+Đây là phần cực kỳ quan trọng vì nó sẽ giúp chúng ta hiểu tại sao 2 object trông giống hệt nhau nhưng so sánh === lại trả về kết quả false
+
+IV. Immutability - tính bất biến 
+Trong React, chúng ta thường muốn tạo dữ liệu mới thay vì sửa dữ liệu cũ 
+Ví dụ , cách cập nhật điểm theo hướng Immutability
+const studentA = {
+  name : "Trung",
+  score : 8
+};
+
+const studentB = {
+  ...,
+  score : 10
+};
+
+console.log(studentA.score); // 8
+console.log(studentB.score); // 10
+
+Ở đây chúng ta object mới và ghi đè score bằng giá trị mới. Object cũ vẫn giữ nguyên.
+
+!!! Lưu ý : Immutability không có nghĩa là JS cấm sửa object. Đó là cách chúng ta chủ động viết code để giữ nguyên dữ liệu cũ và tạo dữ liệu mới khi cần cập nhật
+  4.1 Mutation và Non-mutation là gì ?
+  Có 2 cách làm việc với dữ liệu trong JS
+   1.Mutation thay đổi trực tiếp
+   const numbers = [1,2,3];
+   numbers.push(4);
+   console.log(numbers); // [1,2,3,4]
+
+   ==> Mảng ban đầu đã bị thay đổi
+
+   2. Non-mutation tạo dữ liệu mới
+   const numbers = [1,2,3];
+
+   const newNumbers = [...numbers,4];
+
+   console.log(numbers); // [1,2,3]
+   console.log(newNumbers); // [1,2,3,4]
+
+   ==> Mảng ban đầu được giữ nguyên, mảng mới chứa thêm phần tử 4
+  !!! Lưu ý : const vẫn được dùng ở cả 2 ví dụ. Điều khác biệt không nằm ở const mà nằm ở cách mình thao tác với dữ liệu.
+
+  4.2 Những phương pháp thường dùng:
+   1. Thêm phần tử: dùng .push() ,cách tạo dữ liệu [...arr,item]
+   2. Thêm phần tử vào đầu : dùng .unshift() , cách tạo dữ liệu [item, ...arr]
+   3. Xóa phần tử cuối : .pop(), cách tạo dữ liệu arr.slice(0,-1)
+   4. Cập nhật phần tử : Gán trực tiếp , cách tạo dữ liệu mới map()
+   5. Lọc phần tử : Các tạo dữ liệu mới filter()
+   6. Sao chép mảng : cách tạo dữ liệu mới slice() hoặc [...arr]
+  ==> Trong thực tế, các phương thức thay đổi trực tiếp vẫn có chỗ sử dụng phù hợp. Nhưng khi cần giữ dữ liệu cũ , đặc biệt khi làm việc với React State, cách tạo dữ liệu mới thường hữu ích hơn.
+  
+  4.3 Thực hành cập nhật một phần tử trong mảng 
+  Giả sử chúng ta có mảng danh sách điểm của sinh viên 
+  const studentScores = [7,8,9,10];
+  Chúng ta muốn cập nhật điểm ở vị trí số 1 từ 8 thành 10 , nhưng không được thay đổi mảng studentScores ban đầu
+
+  Ta có thể sử dụng map():
+
+  const newStudentScores = studentScores.map((score,index) => {
+    if(index === 1){
+      return 10;
+    }
+
+    return score;
+  });
+
+  console.log(studentScores); // [7,8,9,10]
+  console.log(newStudentScores); // [7,10,9,10]
+
+  Cách hiểu đơn giản:
+   + map() duyệt qua từng phần tử
+   + Nếu phần tử có index bằng 1 trả về 10
+   + Những phần tử còn lại giữ nguyên giá trị
+   + Kết quả là một mảng mới 
+
+  

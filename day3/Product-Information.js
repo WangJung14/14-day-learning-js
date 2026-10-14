@@ -37,3 +37,5 @@ const {
 console.log(productName);
 console.log(productId);
 console.log(productPrice);
+
+// giải thích vì sao info : {name : productName} không tạo biến info ở đây là mình đang tham chiếu đến biến productName còn info là object chứa giá trị mình cần tham chiếu đến 
