@@ -1,0 +1,631 @@
+I. OOP là gì ? Tại sao cần phải học ?
+OOP là viết tắt của Object-Oriented Programming — lập trình hướng đối tượng.
+Ý tưởng cốt lõi: tổ chức chương trình xung quanh những đối tượng có dữ liệu và hành vi 
+Ví dụ, trong Mini-project Student Manager mình đã làm ở day4, chúng ta đã có:
+const student = {
+    id : 1,
+    name : "Trung",
+    score: 8
+};
+
+Đây là 1 object chứa dữ liệu
+Giờ nếu chúng ta muốn sinh viên có thể thực hiện một hành động, chẳng hạn kiểm tra mình có đậu hay không:
+
+const student = {
+    id: 1,
+    name : "Trung",
+    score : 8,
+
+    isPassed(){
+        return this.score >= 5;
+    }
+};
+console.log(student.isPassed()); // True 
+
+Chúng ta sẽ thấy được điểm khác biệt ở đây: 
+ - name,score là properties(thuộc tính)
+ - isPassed() là method(phương thức)
+ - this.score truy cập thuộc tính score của đối tượng mà this đang tham chiếu đến. Với lời gọi student.isPassed(), this là student
+Một object có thể chứa cả dữ liệu lẫn các hàm xử lý dữ liệu đó. 
+
+II. Vì sao JS cần class ?
+Giả sử cần tạo 100 sinh viên
+Nếu tạo từng object bằng tay:
+const student1 = {
+  name: "An",
+  score: 8
+};
+
+const student2 = {
+  name: "Bình",
+  score: 7
+};
+
+const student3 = {
+  name: "Chi",
+  score: 9
+};
+Cách này vẫn chạy, nhưng lặp lại cấu ttrucs dữ liệu
+Thay vào viết như trên chúng ta có thể dùng class để định nghĩa một khuôn mẫu tạo đối tượng.
+ 2.1 Cú pháp class cơ bản 
+ class Student {
+    constructor(name , score){
+        this.name = name;
+        this.score = score;
+    }
+
+    isPassed(){
+        return this.score >= 5;
+    }
+ }
+ 
+ Chúng ta sẽ phân tích từng phần:
+    1. class Student:  
+    Khai báo một class tên Student. Theo quy ước của JS, tên class thường dùng PascalCase.
+
+    2. constructor(name,score)
+    Đây là phương thức đặc biệt chạy khi chúng ta tạo đối tượng bằng new Student(...) . Nó dùng để khởi tạo trạng thái của đối tượng
+
+    3. this.name = name
+    Gán giá trị tham số name vào thuộc tính name của đối tượng đang được tạo
+
+    4. isPassed()
+    Đây là phương thức dùng chung cho các instance của class. Chúng ta không cần khai báo lại nó trong từng object.
+
+ 2.2 Tạo đối tượng với new
+
+    const an = new Student("An", 8);
+    const binh = new Student("Bình", 4);
+
+    console.log(an.name);       // "An"
+    console.log(an.score);      // 8
+    console.log(an.isPassed()); // true
+
+    console.log(binh.name);       // "Bình"
+    console.log(binh.isPassed()); // false
+ Khi Chạy new Student("An",8), JS tạo 1 instance mới, gọi constructor với this trỏ đến instance đó, rồi trả về đối tượng được tạo trong trường hợp thông thường.
+
+ 2.3 Chuẩn bị cho TS 
+ Đây là phần chúng ta cần đặc biệt chú ý vì sau này sẽ học TS:
+ Javascript:
+    class Student {
+        constructor(name, score) {
+            this.name = name;
+            this.score = score;
+        }
+    }
+ TypeScript:
+    class Student {
+        name: string;
+        score: number;
+
+        constructor(
+            name: string,
+            score: number
+        ) {
+            this.name = name;
+            this.score = score;
+        }
+    }
+ Điểm khác biệt lớn nhất ở ví dụ này là TypeScript cho phép khai báo kiểu dữ liệu:
+  - name : string nghĩa là tên sinh viên phải là kiểu chuỗi
+  - score : number nghĩa là điểm số phải là số
+  - TypeScript kiểm tra kiểu khi phát triển/biên dịch: JS chạy sau khi biên dịch không tự động có kiểm tra kiểu này
+
+ Sau này mình sẽ học thêm public, private, readonly, interface, type và implements. Nhưng trước tiên, chúng ta cần thật chắc class, constructor và this.
+
+III. Hiểu sâu con trỏ this
+3.1 this thực chất là gì?
+Trong JS, this là một giá trị đặc biệt được xác định dựa trên cách một hàm được gọi đối với hàm thông thường.
+
+Đừng vội ghi nhớ rằng this luôn là object chứa hàm. Quy tắc đó không đúng trong mọi tình huống.
+
+Ví dụ: 
+const student = {
+    name : "Trung",
+
+    introduce(){
+        console.log(
+            `Hello, I'm ${this.name}`
+        );
+    }
+};
+student.introduce(); //Hello, I'm Trung
+Ở đây, student là đối tượng đứng trước dấu . trong lời gọi student.introduce(), nên this tham chiếu đến student.
+
+3.2 Khi tách method khỏi object thì sao?
+
+"use strict";
+
+const student = {
+    name : "Trung",
+
+    introduce(){
+        console.log(this.name);
+    }
+};
+
+const sayHello = student.introduce;
+
+sayHello();
+
+Trong trường hợp này, sayHello() được gọi như một hàm độc lập, không có object đứng trước dấu . 
+Với strict mode, this là undefined, nên truy cập this.name sẽ gây TypeError.
+
+So sánh 2 cách gọi:
+ 1. Gọi qua object :
+ student.introduce() -> this = student
+
+ 2. Gọi độc lập strict:
+ sayHello() -> this = undefined
+
+Đây là lý do trong JS, đôi khi chúng ta gặp lỗi mất this khi truyền method làm callback
+
+3.3 Cách giữ this bằng bind()
+
+const student = {
+  name: "An",
+
+  introduce() {
+    console.log(this.name);
+  }
+};
+
+const sayHello = student.introduce.bind(student);
+
+sayHello(); // An
+
+bind(student) tạo ra một hàm mới có this được gắn với student
+Đây là kiến thức rất hữu ích khi đọc code JS cũ hoặc React Class Components
+
+3.4 Chuẩn bị cho TS 
+Trong TS, lỗi mất this vẫn có thể xảy ra vì TypeScript không tự thay đổi cơ chế this của JS
+
+Ví dụ, TS cho phép khai báo kiểu của this trong một hàm để hỗ trợ kiểm tra tĩnh:
+type Student = {
+  name: string;
+};
+
+function introduce(this: Student) {
+  console.log(this.name);
+}
+
+const student: Student = { name: "An" };
+
+introduce.call(student); // An
+
+this: Student chỉ là khai báo kiểu, không phải tham số được truyền vào lúc chạy
+
+IV. Arrow Function và Lexical this
+4.1 Ôn lại: this của hàm thông thường 
+Chúng ta đã học rằng this trong hàm thông thường phụ thuộc vào cách gọi hàm
+"use strict";
+
+const student = {
+    name : "Trung",
+
+    introduce(){
+        console.log(this.name);
+    }
+};
+
+student.introduce(); // Trung
+
+const sayHello = student.introduce;
+sayHello(); // TypeError
+
+Lý do là :
+ - student.introduce() → this là student.
+ - sayHello() → this là undefined trong strict mode.
+Câu hỏi đặt ra: Có cách nào để một hàm giữ được this của nơi đó được tạo ra mà không cần gọi bind() không?
+--> Có. Đó chính là Arrow Function
+
+4.2 Lexical this là gì?
+Arrow Function không có this riêng. Thay vào đó, nó sử dụng this từ môi trường bao ngoài tại thời điểm hàm được định nghĩa.
+Đây được gọi là Lexical this.
+Hãy xem ví dụ :
+
+class Student {
+    constructor(name){
+        this.name = name;
+    }
+
+    introduce(){
+        return() =>{
+            console.log(this.name);
+        };
+    }
+}
+const student = new Student("Trung");
+
+const sayHello = student.introduce();
+sayHello(); // "Trung"
+
+Chúng ta sẽ phân tích từng bước:
+Bước 1: Tạo đối tượng
+const student = new Student("Trung");
+
+JS tạo một instance có thuộc tính name = "Trung"
+
+Bước 2: Gọi phương thức:
+const sayHello = student.introduce();
+Vì gọi qua student, nên this bên trong introduce() là student.
+
+Bước 3: Phương thức trả về Arrow Function
+return () => {
+    console.log(this.name);
+};
+Arrow Function lấy this từ introduce() - tức là đối tượng student 
+
+Bước 4: Gọi hàm độc lập:
+sayHello();
+Mặc dù không có object đứng trước dấu . ,Arrow Function vẫn sử dụng this đã lấy từ môi trường bao ngoài.
+Kết quả là "Trung"
+
+Sơ đồ cơ chế Lexical this
+1. student.introduce(): this = student
+2. Arrow Function được tạo: Sử dụng this từ introduce()
+3. sayHello() -> "Trung"
+
+4.3 So sánh Function thường với Arrow Function:
+Đây là phần quan trọng.
+ 1. This :
+  + Function thường : Phụ thuộc cách gọi 
+  + Arrow Function : Lấy từ môi trường bao ngoài.
+ 2. bind(): 
+  + Function thường :Có thể thay đổi this 
+  + Arrow Function : Không thay đổi được this 
+ 3. new:
+  + Function thường : Có thể dùng với hàm có khả năng làm constructor
+  + Arrow Function : Không thể
+ 4. arguments:
+  + Function thường : Có riêng
+  + Arrow Function : Không có riêng 
+ 5. Sử dụng:
+  + Function thường : Method, constructor, hàm độc lập
+  + Arrow Function : Callback, hàm ngắn, giữ Lexical this
+
+Ví dụ: Vì sao không nên mặc định dùng Arrow Function làm method của Object?
+const student = {
+    name : "Trung",
+
+    introduce : () => {
+        console.log(this.name);
+    }
+};
+student.introduce();
+Ở đây this không tự động trỏ đến student.
+
+Vì Arrow Function không có this riêng, nó lấy this từ phạm vi bên ngoài nơi nó được tạo. Kết quả phụ thuộc môi trường thực thi và không nên kỳ vọng là "Trung"
+
+Cách triển khai phù hợp hơn:
+
+const student = {
+    name : "Trung",
+
+    introduce(){
+        console.log(this.name);
+    }
+};
+
+4.4 Arrow Function trong Class
+Khi học TS, chúng ta sẽ gặp 2 cách định nghĩa hành vi trong class
+Cách 1 - Method thông thường
+
+class Button{
+    constructor(label){
+        this.label = label;
+    }
+
+    handleClick(){
+        console.log(this.label);
+    }
+}
+
+const button = new Button("Submit");
+
+const callBack = button.handleClick;
+
+// callBack(); // TypeError
+
+Cách 2 - Arrow Function Class Field
+
+class Button{
+    constructor(label){
+        this.label = label;
+    }
+    
+    handleClick = () => {
+        console.log(this.label);
+    };
+}
+const button = new Button("Submit");
+
+const callBack = button.handleClick;
+
+callBack(); // "Submit"
+
+Với cách 2, Arrow Function được tạo trong quá trình khởi tạo instance và giữ this của instance đó.
+Đây là kỹ thuật thường gặp trong hệ thống sử dụng callback event handler và code React Class Components cũ.
+
+4.5 Liên hệ TypeScript
+Trong TypeScript:
+
+class Button{
+    label : string;
+
+    constructor(label : string){
+        this.label = label;
+    }
+
+    handleClick = (): void => {
+        console.log(this.label);
+    };
+}
+Chúng ta cần hiểu 3 thành phần:
+ - label: string thuộc tính có kiểu chuỗi
+ - constructor(label : string): tham số đầu vào phải có kiểu chuỗi
+ - (): void => : Arrow Function không trả về giá trị hữu ích
+!!! Lưu ý: TS không tự động sửa lỗi mất this. Arrow Function giữ this nhờ cơ chế của JS không phải nhờ TS
+
+V. Encapsulation - tính đóng gói 
+5.1 Encapsulation là gì ?
+Encapsulation(đóng gói) là nguyên tắc kết hợp dữ liệu và những hành vi liên quan trong một đối tượng, đồng thời kiểm soát cách bên ngoài truy cập hoặc thay đổi trạng thái của đối tượng.
+
+Chúng ta hãy tưởng tượng mình đang xây dựng 1 hệ thống ngân hàng bằng JS.
+
+Một tài khoản sẽ có: 
+  - Chủ tài khoản (owner)
+  - Số dư (balance)
+  - Nạp tiền (deposit)
+  - Rút tiền (withdraw)
+Nếu không kiểm soát cách thay đổi số dư, hệ thống có thể gặp vấn đề.
+VD1 : Không có sự bảo vệ dữ liệu
+class BankAccount {
+  constructor(owner, balance) {
+    this.owner = owner;
+    this.balance = balance;
+  }
+
+  deposit(amount) {
+    this.balance += amount;
+  }
+
+  withdraw(amount) {
+    this.balance -= amount;
+  }
+}
+
+const account = new BankAccount("Trung", 1000);
+
+account.withdraw(5000);
+
+console.log(account.balance); // -4000
+
+Vấn đề đầu tiên: Chúng ta có thể rút nhiều hơn số dư hiện có.
+Nhưng có 1 vấn đề nghiêm trọng hơn:
+account.balance = 999999999;
+console.log(account.balance); //999999999
+
+Người sử dụng class có thể trực tiếp thay đổi số dư mà không thông qua phương thức nghiệp vụ.
+Đây là một thiết kế nguy hiểm đối với dữ liệu quan trọng.
+Câu hỏi: Làm sao để bên ngoài không thể tùy ý thay đổi balance, mà phải sử dụng deposit() hoặc withdraw()?
+Đó chính là một ứng dụng quan trọng của Encapsulation
+
+5.2 Private Field trong JS
+JS hiện đại hỗ trợ thuộc tính private bằng ký hiệu #
+
+class BankAccount{
+    #balance;
+
+    constructor(owner, balance){
+        this.owner = owner;
+        this.#balance = balance;
+    }
+
+    deposit(amount){
+        if(amout <= 0){
+            throw new Error("Amount must be positive");
+        }
+
+        this.#balance += amount;
+    }
+
+    withdraw(amount) {
+        if (amount <= 0) {
+        throw new Error("Amount must be positive");
+        }
+
+        if (amount > this.#balance) {
+        throw new Error("Insufficient balance");
+        }
+
+        this.#balance -= amount;
+    }
+
+    getBalance() {
+        return this.#balance;
+    }
+}
+
+Sử dụng:
+const account = new BankAccount("Trung", 1000);
+
+account.deposit(500);
+account.withdraw(200);
+
+console.log(account.getBalance()); // 1300
+
+Nếu cố truy cập trực tiếp:
+
+console.log(account.#balance);
+JS sẽ báo SyntaxError vì private field chỉ được truy cập trong phần thân class khai báo nó.
+
+5.3 Nhưng ví dụ ở trên đã hoàn hảo chưa?
+Chúng ta hãy để ý vào đoạn code:
+const account = new BankAccount("Trung",-5000);
+
+Ở phiên bản trên, constructor vẫn cho phép tạo tài khoản có số dư âm
+Như vậy, dù #balance đã được bảo vệ khỏi truy cập dữ liệu trực tiếp, trạng thái ban đầu vẫn có thể không hợp lệ.
+
+Đây là bài học quan trọng:
+Encapsulation không chỉ là dùng private. Encapsulation còn là bảo vệ các quy tắc hợp lệ của đối tượng (invariants)
+
+Ta có thể cải thiện constructor:
+class BankAccount{
+    #balance;
+
+    constructor(owner , balance = 0){
+        if(!number.isFinite(balance) || balance < 0){
+            throw new Error("Invalid initial balance");
+        }
+
+        this.owner = owner;
+        this.#balance = balance;
+    }
+
+    deposit(amount){
+        if(!Number.isFinite(amount) || amount <= 0){
+            throw new Error("Invalid deposit amount");            
+        }
+        this.#balance += amount;
+    }
+    
+    withdraw(amount) {
+        if (!Number.isFinite(amount) || amount <= 0) {
+            throw new Error("Invalid withdrawal amount");
+        }
+
+        if (amount > this.#balance) {
+            throw new Error("Insufficient balance");
+        }
+
+        this.#balance -= amount;
+    }
+
+    getBalance() {
+        return this.#balance;
+    }
+}
+Giờ đây, đối tượng đã kiểm soát dữ liệu ngay từ lúc khởi tạo và trong quá trình thay đổi trạng thái.
+Note: Với hệ thống tài chính thật, không nên dựa vào số thực dấu phẩy động để lưu tiền 1 cách tùy tiện. Thường cần dùng đơn vị tiền nhỏ nhất dạng số nguyên an toàn hoặc kiểu decimal phù hợp.
+
+5.4 Getter và Setter là gì?
+Ngoài phương thức getBalance(), JS còn hỗ trợ cú pháp get và set
+
+1. Getter:
+Getter cho phép đọc một giá trị thông qua cú pháp thuộc tính 
+class Student {
+  #score;
+
+  constructor(name, score) {
+    this.name = name;
+    this.#score = score;
+  }
+
+  get score() {
+    return this.#score;
+  }
+}
+
+const student = new Student("Trung", 8);
+
+console.log(student.score); // 8
+
+!!! Chú ý: student.score không phải là student.score()
+
+Mặc dù được định nghĩa bằng cú pháp phương thức, getter được truy cập như một thuộc tính.
+
+2. Setter:
+Setter cho phép kiểm soát giá trị được gán.
+class Student {
+  #score;
+
+  constructor(name, score) {
+    this.name = name;
+    this.score = score;
+  }
+
+  get score() {
+    return this.#score;
+  }
+
+  set score(value) {
+    if (
+      typeof value !== "number" ||
+      !Number.isFinite(value) ||
+      value < 0 ||
+      value > 10
+    ) {
+      throw new Error("Score must be between 0 and 10");
+    }
+
+    this.#score = value;
+  }
+}
+Sử dụng:
+const student = new Student("Trung", 8);
+
+console.log(student.score); // 8
+
+student.score = 9;
+
+console.log(student.score); // 9
+
+student.score = 15; // Error
+
+Ở đây, constructor gọi setter qua this.score = score, vì vậy dữ liệu đầu vào cũng được kiểm tra.
+
+Khi nào nên dùng Setter/Getter:
+ - Getter : Chỉ đọc dữ liệu
+ - Setter : Gán giá trị có kiểm tra
+ - Method : Thực hiện hành động nghiệp vụ như chuyển tiền
+ - Getter không có Setter : Không cho phép bên ngoài thay đổi dữ liệu.
+
+!!! Không phải thuộc tính nào cũng cần getter và setter. Chỉ nên dùng khi chúng giúp thiết kế rõ ràng hoặc kiểm soát dữ liệu tốt hơn.
+
+5.5. Encapsulation trong TypeScript
+Đây là phần quan trọng để chuẩn bị cho TS.
+TypeScript hỗ trợ access modifiers như public, private, protected.
+class BankAccount {
+  private balance: number;
+
+  constructor(
+    public owner: string,
+    initialBalance: number
+  ) {
+    if (!Number.isFinite(initialBalance) || initialBalance < 0) {
+      throw new Error("Invalid balance");
+    }
+
+    this.balance = initialBalance;
+  }
+
+  public deposit(amount: number): void {
+    if (!Number.isFinite(amount) || amount <= 0) {
+      throw new Error("Invalid amount");
+    }
+
+    this.balance += amount;
+  }
+
+  public getBalance(): number {
+    return this.balance;
+  }
+}
+
+Trong TypeScript:
+- public: có thể truy cập từ bên ngoài.
+- private: chỉ cho phép truy cập trong class theo kiểm tra kiểu của TypeScript.
+- protected: cho phép class khai báo và class kế thừa truy cập.
+- readonly: ngăn việc gán lại thuộc tính ngoài những vị trí được phép khi kiểm tra kiểu.
+
+Một khác biệt cực kỳ quan trọng:
+private balance: number;
+Đây là private theo hệ thống kiểu TypeScript, chủ yếu được kiểm tra lúc biên dịch.
+
+Trong khi:
+#balance: number;
+là JavaScript private field, có cơ chế bảo vệ thực sự khi chạy.
+
+==> 2 cách này không hoàn toàn giống nhau
